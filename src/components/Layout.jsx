@@ -5,8 +5,8 @@ import SearchBox from './SearchBox';
 
 const COMMIT_HASH = typeof __COMMIT_HASH__ !== 'undefined' ? __COMMIT_HASH__ : 'dev';
 const COMMIT_SHORT = typeof __COMMIT_SHORT__ !== 'undefined' ? __COMMIT_SHORT__ : 'dev';
-const API_URL = 'https://github.com/r-thak/kingfisher-api';
-const WEB_REPO_URL = 'https://github.com/r-thak/kingfisher-web';
+const API_URL = 'https://github.com/m-cro/kingfisher-api';
+const WEB_REPO_URL = 'https://github.com/m-cro/kingfisher-web';
 
 function Layout({ children }) {
   const location = useLocation();
