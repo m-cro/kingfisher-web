@@ -7,8 +7,8 @@ Inspired by [Madgrades](https://github.com/Madgrades/madgrades.com).
 ## Development
 
 ```sh
-bun install
-bun run dev
+npm ci
+npm run dev
 ```
 
 The dev server proxies `/v1` requests to a local instance of the [Kingfisher API](https://github.com/m-cro/kingfisher-api). Set `VITE_API_URL` to point at a different API instance if needed.
@@ -16,7 +16,7 @@ The dev server proxies `/v1` requests to a local instance of the [Kingfisher API
 ## Building
 
 ```sh
-bun run build
+npm run build
 ```
 
 ## Docker

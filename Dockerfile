@@ -1,13 +1,12 @@
-FROM oven/bun:latest AS build
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
-# Install git so vite can embed the real commit hash at build time.
-RUN apt-get update && apt-get install -y --no-install-recommends git \
-    && rm -rf /var/lib/apt/lists/*
+# Install git so Vite can embed the real commit hash at build time.
+RUN apk add --no-cache git
 
-COPY package.json bun.lock ./
-RUN bun install --frozen-lockfile
+COPY package.json package-lock.json ./
+RUN npm ci
 
 COPY . .
 
@@ -17,7 +16,7 @@ ARG COMMIT_SHORT=dev
 ENV COMMIT_HASH=$COMMIT_HASH
 ENV COMMIT_SHORT=$COMMIT_SHORT
 
-RUN bun run build
+RUN npm run build
 
 FROM oven/bun:slim
 
