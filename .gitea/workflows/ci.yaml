@@ -64,7 +64,5 @@ jobs:
           GHCR_SHA_IMAGE: ghcr.io/m-cro/kingfisher-web:${{ github.sha }}
           GHCR_LATEST_IMAGE: ghcr.io/m-cro/kingfisher-web:latest
         run: |
-          docker build --build-arg COMMIT_HASH="${GITHUB_SHA}" --build-arg COMMIT_SHORT="${GITHUB_SHA::7}" \
+          docker buildx build --push --build-arg COMMIT_HASH="${GITHUB_SHA}" --build-arg COMMIT_SHORT="${GITHUB_SHA::7}" \
             --tag "$GHCR_SHA_IMAGE" --tag "$GHCR_LATEST_IMAGE" .
-          docker push "$GHCR_SHA_IMAGE"
-          docker push "$GHCR_LATEST_IMAGE"
