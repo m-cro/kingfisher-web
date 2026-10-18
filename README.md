@@ -1,6 +1,6 @@
 # Kingfisher
 
-The source for Kingfisher, a web interface for visualizing the data provided by the Kingfisher API [[source]](https://github.com/m-cro/kingfisher-api).
+The source for Kingfisher, a web interface for visualizing the data provided by the Kingfisher API [[source]](https://git.rthak.com/rthak/kingfisher-api).
 
 Inspired by [Madgrades](https://github.com/Madgrades/madgrades.com).
 
@@ -11,7 +11,7 @@ npm ci
 npm run dev
 ```
 
-The dev server proxies `/v1` requests to a local instance of the [Kingfisher API](https://github.com/m-cro/kingfisher-api). Set `VITE_API_URL` to point at a different API instance if needed.
+The dev server proxies `/v1` requests to a local instance of the [Kingfisher API](https://git.rthak.com/rthak/kingfisher-api). Set `VITE_API_URL` to point at a different API instance if needed.
 
 ## Building
 
