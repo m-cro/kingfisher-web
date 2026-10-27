@@ -85,6 +85,17 @@ const SORT_SUBJECTS = [
   ...SORT_OPTIONS,
 ];
 
+// Gen Ed category ids as returned by the UIUC Course Explorer
+const GEN_ED_OPTIONS = [
+  { value: 'ACP', label: 'Advanced Composition' },
+  { value: 'COMP1', label: 'Composition I' },
+  { value: 'CS', label: 'Cultural Studies' },
+  { value: 'HUM', label: 'Humanities & the Arts' },
+  { value: 'NAT', label: 'Natural Sciences & Technology' },
+  { value: 'QR', label: 'Quantitative Reasoning' },
+  { value: 'SBS', label: 'Social & Behavioral Sciences' },
+];
+
 function Explore() {
   const navigate = useNavigate();
   const queryParams = useQuery();
@@ -94,6 +105,7 @@ function Explore() {
   const sort = queryParams.get('sort') || 'totalStudents';
   const order = queryParams.get('order') || 'desc';
   const filterSubject = queryParams.get('subject') || '';
+  const filterGenEd = queryParams.get('genEd') || '';
 
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -137,6 +149,9 @@ function Explore() {
     if (filterSubject && (activeTab === 'courses' || activeTab === 'instructors')) {
       params.subject = filterSubject;
     }
+    if (filterGenEd && activeTab === 'courses') {
+      params.genEd = filterGenEd;
+    }
 
     const fetcher =
       activeTab === 'subjects' ? exploreSubjects :
@@ -154,10 +169,10 @@ function Explore() {
         setError('The server is currently unreachable. Please ensure the backend API is running.');
       })
       .finally(() => setLoading(false));
-  }, [activeTab, currentPage, sort, order, filterSubject]);
+  }, [activeTab, currentPage, sort, order, filterSubject, filterGenEd]);
 
-  const buildUrl = (tab, page, col, dir, subj) =>
-    `/explore?tab=${tab}&page=${page}&sort=${col}&order=${dir}${subj ? `&subject=${subj}` : ''}`;
+  const buildUrl = (tab, page, col, dir, subj, genEd = filterGenEd) =>
+    `/explore?tab=${tab}&page=${page}&sort=${col}&order=${dir}${subj ? `&subject=${subj}` : ''}${genEd ? `&genEd=${genEd}` : ''}`;
 
   const handleTabChange = (tab) => navigate(`/explore?tab=${tab}&page=1`);
   const handlePageChange = (page) => navigate(buildUrl(activeTab, page, sort, order, filterSubject));
@@ -171,6 +186,10 @@ function Explore() {
     setSubjectInput(subjectMap[code] ? `${code} — ${subjectMap[code]}` : code);
     setSubjectDropdownOpen(false);
     navigate(buildUrl(activeTab, 1, sort, order, code));
+  };
+
+  const handleGenEdChange = (e) => {
+    navigate(buildUrl(activeTab, 1, sort, order, filterSubject, e.target.value));
   };
 
   const handleSubjectClear = () => {
@@ -397,6 +416,21 @@ function Explore() {
                 </div>
               )}
             </div>
+          )}
+
+          {/* Gen Ed filter – courses tab only */}
+          {activeTab === 'courses' && (
+            <select
+              value={filterGenEd}
+              onChange={handleGenEdChange}
+              style={{ ...inputStyle, cursor: 'pointer' }}
+              aria-label="Filter by Gen Ed category"
+            >
+              <option value="">All Gen Ed</option>
+              {GEN_ED_OPTIONS.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
           )}
 
           {/* Sort dropdown */}
