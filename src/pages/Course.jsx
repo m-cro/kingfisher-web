@@ -5,7 +5,7 @@ import GpaTrendChart from '../components/GpaTrendChart';
 import CourseChartViewer from '../components/CourseChartViewer';
 import CourseDescription from '../components/CourseDescription';
 import ScheduledSections from '../components/ScheduledSections';
-import { aggregateGrades } from '../utils/gradeStats';
+import { aggregateGrades, gradeGpa } from '../utils/gradeStats';
 
 const FLAT_CARD_STYLE = {
   padding: '1.5rem',
@@ -210,10 +210,15 @@ function Course() {
   }, [courseOfferings, selectedTermId]);
 
   const termOptions = useMemo(() => {
-    const opts = [{ termId: 0, yearTerm: 'Filter semesters...' }];
+    const opts = [{ termId: 0, label: 'Filter semesters...' }];
     courseOfferings.forEach(o => {
       const taughtBy = selectedInstructorId === 0 || o.sections?.some(s => s.instructor?.id === selectedInstructorId);
-      if (taughtBy) opts.push({ termId: o.termId, yearTerm: o.yearTerm });
+      if (taughtBy) opts.push({
+        termId: o.termId,
+        label: gradeGpa(o.cumulative) === null
+          ? `${o.yearTerm} (${o.cumulative?.total > 0 ? 'no letter grades' : 'no grades yet'})`
+          : o.yearTerm,
+      });
     });
     return opts;
   }, [courseOfferings, selectedInstructorId]);
@@ -341,7 +346,7 @@ function Course() {
                   placeholder="Filter semesters..."
                   searchPlaceholder="Search semesters..."
                   valueKey="termId"
-                  labelKey="yearTerm"
+                  labelKey="label"
                 />
               </div>
 
@@ -409,7 +414,7 @@ function Course() {
                     </table>
                   </div>
                 ) : (
-                  <p style={{ color: 'var(--text-secondary)', margin: 0 }}>No instructors found matching your filter.</p>
+                  <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{instructors.length === 0 ? 'No instructor grade data available yet.' : 'No instructors found matching your filter.'}</p>
                 )}
               </div>
             </>

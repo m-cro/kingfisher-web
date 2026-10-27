@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import useTheme from '../hooks/useTheme';
-import { instructorGrades } from '../utils/gradeStats';
+import { gradeGpa, instructorGrades } from '../utils/gradeStats';
 
 const GRADE_KEYS = ['aPlus', 'a', 'aMinus', 'bPlus', 'b', 'bMinus', 'cPlus', 'c', 'cMinus', 'dPlus', 'd', 'dMinus', 'f'];
 const GRADE_LABELS = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
@@ -100,24 +100,35 @@ function CourseChartViewer({ gradesData, selectedTermId, selectedInstructorId })
   const displayGrades = isFiltered ? filteredGrades : cumulativeGrades;
   const averageGrades = selectedTermId === 0 ? cumulativeGrades
     : courseOfferings.find(offering => offering.termId === selectedTermId)?.cumulative;
-  const formatGpa = value => Number.isFinite(value) ? value.toFixed(2) : 'N/A';
+  const selectionGpa = gradeGpa(displayGrades);
+  const formatGpa = grades => {
+    const value = gradeGpa(grades);
+    return value === null ? 'N/A' : value.toFixed(2);
+  };
+  const noDataMessage = displayGrades?.total > 0
+    ? 'No letter grades available for this selection.'
+    : selectedTermId !== 0 ? 'No grade data available for this semester yet.'
+    : selectedInstructorId !== 0 ? 'No grade data available for this instructor selection.'
+    : 'No grade data available for this course yet.';
 
   return (
     <div className="CourseChartViewer">
       <div className="chart-container">
-        <ReactECharts
+        {selectionGpa === null ? (
+          <div role="status" className="grade-empty-state" style={{ minHeight: '350px', display: 'grid', placeItems: 'center', textAlign: 'center', color: 'var(--text-secondary)', padding: '1rem' }}>{noDataMessage}</div>
+        ) : <ReactECharts
           option={option}
           notMerge
           style={{ height: '350px', width: '100%' }}
           theme={theme === 'dark' ? 'dark' : undefined}
-        />
+        />}
       </div>
 
       {cumulativeGrades && (
         <div className="grade-summary" aria-live="polite" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem 1.5rem', marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
           <span>Total Grades: <strong style={{ color: 'var(--text-primary)' }}>{(displayGrades?.total ?? 0).toLocaleString()}</strong></span>
-          <span title="Course average for the selected semester, or all semesters when none is selected">Average GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(averageGrades?.gpa)}</strong></span>
-          {selectedInstructorId !== 0 && <span title="Selected instructor’s GPA for this course and semester selection">Instructor GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(filteredGrades?.gpa)}</strong></span>}
+          <span title="Course average for the selected semester, or all semesters when none is selected">Average GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(averageGrades)}</strong></span>
+          {selectedInstructorId !== 0 && <span title="Selected instructor’s GPA for this course and semester selection">Instructor GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(filteredGrades)}</strong></span>}
         </div>
       )}
     </div>

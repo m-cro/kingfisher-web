@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { aggregateGrades, instructorGrades } from '../gradeStats.js';
+import { aggregateGrades, gradeGpa, instructorGrades } from '../gradeStats.js';
 
 test('weights grade counts and excludes withdrawals from GPA', () => {
   const grades = aggregateGrades([{ a: 1, w: 3 }, { b: 3 }, null]);
@@ -22,4 +22,21 @@ test('filters instructor grades by instructor and semester', () => {
   assert.equal(instructorGrades(offerings, 7, 1).gpa, 4);
   assert.equal(instructorGrades(offerings, 99), null);
   assert.equal(instructorGrades(offerings, 7, 99), null);
+});
+
+test('schedule-only semesters have no GPA, even with a legacy zero from the API', () => {
+  assert.equal(gradeGpa({ total: 0, gpa: 0 }), null);
+  assert.equal(gradeGpa({ total: 0, gpa: null }), null);
+  assert.equal(gradeGpa(null), null);
+  assert.equal(gradeGpa({ w: 4, total: 4, gpa: 0 }), null);
+  assert.equal(gradeGpa({ f: 4, total: 4, gpa: 0 }), 0);
+});
+
+test('adding an empty semester does not change historical instructor grades', () => {
+  const offerings = [
+    { termId: 1, sections: [{ instructor: { id: 7 }, grades: { a: 1, b: 3 } }] },
+    { termId: 2, cumulative: { total: 0, gpa: 0 }, sections: [] },
+  ];
+  assert.equal(instructorGrades(offerings, 7).gpa, 3.25);
+  assert.equal(instructorGrades(offerings, 7, 2), null);
 });

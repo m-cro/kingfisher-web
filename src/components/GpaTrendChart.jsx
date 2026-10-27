@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import useTheme from '../hooks/useTheme';
-import { instructorGrades } from '../utils/gradeStats';
+import { gradeGpa, instructorGrades } from '../utils/gradeStats';
 
 const SEASON_ORDER = { 'wi': 1, 'sp': 2, 'su': 3, 'fa': 4 };
 
@@ -29,9 +29,10 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
   const categories = sorted.map(o => o.yearTerm);
 
   // Course-wide GPA for every term (always shown)
-  const courseGpaData = sorted.map(o =>
-    Number.isFinite(o.cumulative?.gpa) ? parseFloat(o.cumulative.gpa.toFixed(2)) : null
-  );
+  const courseGpaData = sorted.map(offering => {
+    const gpa = gradeGpa(offering.cumulative);
+    return gpa === null ? null : parseFloat(gpa.toFixed(2));
+  });
 
   // Instructor-specific GPA (only for terms that instructor taught, null otherwise)
   const instructorGpaData = isFiltered
@@ -68,7 +69,7 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
       itemStyle: { color: 'rgba(233,75,38,0.35)' },
       lineStyle: { width: 2, color: 'rgba(233,75,38,0.35)', type: 'dashed' },
       areaStyle: makeAreaStyle('#e94b26', 0.08),
-      connectNulls: true,
+      connectNulls: false,
     });
     // Instructor line as primary, only where they taught
     series.push({
@@ -93,7 +94,7 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
       itemStyle: { color: '#e94b26' },
       lineStyle: { width: 3 },
       areaStyle: makeAreaStyle('#e94b26', 0.30),
-      connectNulls: true,
+      connectNulls: false,
     });
   }
 
@@ -135,12 +136,14 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
 
   return (
     <div className="GpaTrendChart">
-      <ReactECharts
+      {courseGpaData.every(value => value === null) && !instructorGpaData?.some(value => value !== null)
+        ? <div role="status" className="grade-empty-state" style={{ minHeight: '350px', display: 'grid', placeItems: 'center', textAlign: 'center', color: 'var(--text-secondary)', padding: '1rem' }}>No GPA data available for this course yet.</div>
+        : <ReactECharts
         option={option}
         notMerge
         style={{ height: '350px', width: '100%' }}
         theme={theme === 'dark' ? 'dark' : undefined}
-      />
+      />}
     </div>
   );
 }

@@ -26,3 +26,9 @@ export function instructorGrades(offerings, instructorId, termId = 0) {
     .map(section => section.grades);
   return distributions.length ? aggregateGrades(distributions) : null;
 }
+
+// Derive availability from counts, including when an older API reports gpa: 0
+// for a schedule-only semester. An actual all-F distribution still yields 0.
+export function gradeGpa(distribution) {
+  return distribution ? aggregateGrades([distribution]).gpa : null;
+}
