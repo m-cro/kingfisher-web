@@ -1,34 +1,10 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import useTheme from '../hooks/useTheme';
+import { instructorGrades } from '../utils/gradeStats';
 
 const GRADE_KEYS = ['aPlus', 'a', 'aMinus', 'bPlus', 'b', 'bMinus', 'cPlus', 'c', 'cMinus', 'dPlus', 'd', 'dMinus', 'f'];
 const GRADE_LABELS = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
-
-const GPA_MAP = {
-  aPlus: 4.0, a: 4.0, aMinus: 3.67,
-  bPlus: 3.33, b: 3.0, bMinus: 2.67,
-  cPlus: 2.33, c: 2.0, cMinus: 1.67,
-  dPlus: 1.33, d: 1.0, dMinus: 0.67,
-  f: 0.0
-};
-
-function aggregateSections(sections) {
-  const agg = { total: 0, qualityPoints: 0 };
-  GRADE_KEYS.forEach(k => agg[k] = 0);
-
-  sections.forEach(s => {
-    GRADE_KEYS.forEach(k => { agg[k] += (s[k] || 0); });
-    agg.total += (s.total || 0);
-    GRADE_KEYS.filter(k => k !== 'w').forEach(k => {
-      agg.qualityPoints += (s[k] || 0) * (GPA_MAP[k] ?? 0);
-    });
-  });
-
-  const nonW = agg.total - (agg.w || 0);
-  agg.gpa = nonW > 0 ? agg.qualityPoints / nonW : 0;
-  return agg;
-}
 
 function toPercent(grades) {
   const total = GRADE_KEYS.reduce((s, k) => s + (grades[k] || 0), 0);
@@ -51,19 +27,7 @@ function CourseChartViewer({ gradesData, selectedTermId, selectedInstructorId })
       return offering?.cumulative ?? null;
     }
 
-    const sections = [];
-    courseOfferings.forEach(offering => {
-      if (selectedTermId === 0 || offering.termId === selectedTermId) {
-        offering.sections?.forEach(section => {
-          if (section.instructor?.id === selectedInstructorId) {
-            sections.push(section.grades);
-          }
-        });
-      }
-    });
-
-    if (sections.length === 0) return null;
-    return aggregateSections(sections);
+    return instructorGrades(courseOfferings, selectedInstructorId, selectedTermId);
   }, [selectedTermId, selectedInstructorId, courseOfferings, isFiltered]);
 
   const axisColor = theme === 'dark' ? '#eee' : '#333';
@@ -109,7 +73,7 @@ function CourseChartViewer({ gradesData, selectedTermId, selectedInstructorId })
         return `${gradeLabel}: ${params[0]?.value}%`;
       }
     },
-    legend: isFiltered ? {
+    legend: series.length > 1 ? {
       data: ['Course Overall', 'Selection'],
       textStyle: { color: axisColor, fontSize: 12 },
       top: 0
@@ -133,23 +97,27 @@ function CourseChartViewer({ gradesData, selectedTermId, selectedInstructorId })
     animation: false
   };
 
-  const displayGrades = (isFiltered && filteredGrades) ? filteredGrades : cumulativeGrades;
+  const displayGrades = isFiltered ? filteredGrades : cumulativeGrades;
+  const averageGrades = selectedTermId === 0 ? cumulativeGrades
+    : courseOfferings.find(offering => offering.termId === selectedTermId)?.cumulative;
+  const formatGpa = value => Number.isFinite(value) ? value.toFixed(2) : 'N/A';
 
   return (
     <div className="CourseChartViewer">
       <div className="chart-container">
         <ReactECharts
           option={option}
+          notMerge
           style={{ height: '350px', width: '100%' }}
           theme={theme === 'dark' ? 'dark' : undefined}
         />
       </div>
 
-      {displayGrades && (
-        <div style={{ textAlign: 'center', marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.95rem', fontFamily: 'Lato, "Helvetica Neue", Arial, Helvetica, sans-serif' }}>
-          <span>Total Grades: <strong style={{ color: 'var(--text-primary)' }}>{displayGrades.total?.toLocaleString()}</strong></span>
-          <span style={{ margin: '0 1rem' }}>|</span>
-          <span>Average GPA: <strong style={{ color: '#e94b26' }}>{displayGrades.gpa?.toFixed(2) || 'N/A'}</strong></span>
+      {cumulativeGrades && (
+        <div className="grade-summary" aria-live="polite" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem 1.5rem', marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+          <span>Total Grades: <strong style={{ color: 'var(--text-primary)' }}>{(displayGrades?.total ?? 0).toLocaleString()}</strong></span>
+          <span title="Course average for the selected semester, or all semesters when none is selected">Average GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(averageGrades?.gpa)}</strong></span>
+          {selectedInstructorId !== 0 && <span title="Selected instructor’s GPA for this course and semester selection">Instructor GPA: <strong style={{ color: '#e94b26' }}>{formatGpa(filteredGrades?.gpa)}</strong></span>}
         </div>
       )}
     </div>

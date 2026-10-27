@@ -5,6 +5,7 @@ import GpaTrendChart from '../components/GpaTrendChart';
 import CourseChartViewer from '../components/CourseChartViewer';
 import CourseDescription from '../components/CourseDescription';
 import ScheduledSections from '../components/ScheduledSections';
+import { aggregateGrades } from '../utils/gradeStats';
 
 const FLAT_CARD_STYLE = {
   padding: '1.5rem',
@@ -164,21 +165,17 @@ function Course() {
             offering.sections.forEach(sec => {
               const name = sec.instructor?.name || 'Unknown Instructor';
               if (!instructorMap[name]) {
-                instructorMap[name] = { name, totalStudents: 0, gpaPoints: 0 };
+                instructorMap[name] = { name, distributions: [] };
               }
               const g = sec.grades;
-              if (g && g.total) {
-                instructorMap[name].totalStudents += g.total;
-                instructorMap[name].gpaPoints += (g.gpa * g.total);
-              }
+              if (g) instructorMap[name].distributions.push(g);
             });
           }
         });
-        const list = Object.values(instructorMap).map(inst => ({
-          name: inst.name,
-          totalStudents: inst.totalStudents,
-          gpa: inst.totalStudents > 0 ? (inst.gpaPoints / inst.totalStudents) : null
-        }));
+        const list = Object.values(instructorMap).map(inst => {
+          const stats = aggregateGrades(inst.distributions);
+          return { name: inst.name, totalStudents: stats.total, gpa: stats.gpa };
+        });
         setInstructors(list);
       }
     })

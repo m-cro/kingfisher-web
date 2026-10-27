@@ -18,18 +18,21 @@ function Layout({ children }) {
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <header className="SiteHeader">
         <div className="container">
-          <div style={{ display: 'flex', alignItems: 'center', minHeight: '72px', gap: '1.5rem' }}>
+          <div className="site-header-row">
             <Link to="/" className="logo" style={{ color: '#fff', textDecoration: 'none', fontWeight: '800', fontSize: '1.5rem', letterSpacing: '-0.03em', whiteSpace: 'nowrap' }}>
               Kingfisher
             </Link>
 
-            <div style={{ flex: 1, margin: '0 1.5rem' }}>
+            <div className="site-header-search">
               <SearchBox />
             </div>
 
             <div className="nav-links" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', whiteSpace: 'nowrap' }}>
               <Link to="/search" className={isActive('/search') || isActive('/courses') ? 'active' : ''} style={{ padding: '0.5rem 1rem', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontWeight: '500', borderRadius: '6px' }}>
                 Courses
+              </Link>
+              <Link to="/instructors" className={isActive('/instructors') ? 'active' : ''} style={{ padding: '0.5rem 1rem', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontWeight: '500', borderRadius: '6px' }}>
+                Instructors
               </Link>
               <Link to="/explore" className={isActive('/explore') ? 'active' : ''} style={{ padding: '0.5rem 1rem', color: 'rgba(255, 255, 255, 0.7)', textDecoration: 'none', fontWeight: '500', borderRadius: '6px' }}>
                 Explore

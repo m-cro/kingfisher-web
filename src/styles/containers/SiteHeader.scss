@@ -65,3 +65,22 @@
     }
   }
 }
+.SiteHeader {
+  .site-header-row { display: flex; align-items: center; min-height: 72px; gap: 1.5rem; }
+  .site-header-search { flex: 1; min-width: 0; }
+  .SearchBox { width: 100%; min-width: 0; }
+  .SearchBox input { min-width: 0; }
+  .SearchBox button { display: flex; align-items: center; border: 0; background: transparent; padding: 0.5rem 0; }
+  .nav-links a.active { color: #fff !important; background: rgba(255, 255, 255, 0.1); }
+  @media (max-width: 850px) {
+    .site-header-row { flex-wrap: wrap; gap: 0.75rem; padding: 0.75rem 0; }
+    .site-header-search { order: 3; flex-basis: 100%; }
+    .nav-links { margin-left: auto; gap: 0 !important; }
+    .nav-links a { padding: 0.5rem !important; font-size: 0.8rem; }
+  }
+  @media (max-width: 420px) {
+    .site-header-row { gap: 0.25rem; }
+    .logo { font-size: 1.25rem !important; }
+    .nav-links a { padding: 0.4rem !important; font-size: 0.75rem; }
+  }
+}

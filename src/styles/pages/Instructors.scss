@@ -1,0 +1,28 @@
+.Instructors {
+  margin: 2rem 0 3rem;
+  .instructor-heading { margin: 1.5rem 0 2rem; max-width: 48rem; }
+  .instructor-heading h1 { font-size: clamp(2.5rem, 6vw, 3.5rem); margin-bottom: 0.75rem; }
+  .instructor-heading p { color: var(--text-secondary); line-height: 1.6; }
+  .instructor-heading .instructor-eyebrow { color: var(--accent-red); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; margin-bottom: 1rem; }
+  .instructor-hint { margin-top: 0.5rem; font-size: 0.85rem; }
+  .instructor-directory { border: 1px solid var(--border-color); background: var(--bg-card); }
+  .instructor-directory-bar { padding: 1rem 1.25rem; background: var(--bg-secondary); font-size: 0.8rem; color: var(--text-secondary); display: flex; justify-content: space-between; gap: 1rem; }
+  .instructor-directory-bar a, .instructor-back { color: var(--accent-red); text-underline-offset: 3px; font-size: 0.85rem; }
+  .instructor-results { list-style: none; margin: 0; padding: 0; }
+  .instructor-results li { border-top: 1px solid var(--border-color); }
+  .instructor-result { display: flex; align-items: center; gap: 1rem; padding: 1.25rem; color: var(--text-primary); text-decoration: none; transition: background-color 150ms; }
+  .instructor-result:hover { background: var(--bg-secondary); }
+  .instructor-result:focus-visible { outline: 2px solid var(--accent-red); outline-offset: -2px; }
+  .instructor-monogram { display: grid; place-items: center; width: 2.75rem; height: 2.75rem; flex-shrink: 0; background: var(--bg-secondary); color: var(--accent-red); border: 1px solid var(--border-color); font-family: Georgia, serif; font-size: 1.5rem; }
+  .instructor-result-name { flex: 1; font-weight: 600; overflow-wrap: anywhere; }
+  .instructor-result-action { color: var(--text-secondary); font-size: 0.8rem; white-space: nowrap; }
+  .instructor-result-action span { color: var(--accent-red); padding-left: 0.5rem; }
+  .instructor-message { padding: 2.5rem 1.25rem; color: var(--text-secondary); line-height: 1.6; }
+  .instructor-message h2 { font-size: 1.25rem; color: var(--text-primary); }
+  .instructor-message button { margin-top: 1rem; }
+  .instructor-back { display: inline-block; margin-top: 0.75rem; }
+  @media (max-width: 550px) {
+    .instructor-result { gap: 0.75rem; padding: 1rem; flex-wrap: wrap; }
+    .instructor-result-action { font-size: 0.7rem; }
+  }
+}

@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import ReactECharts from 'echarts-for-react';
 import useTheme from '../hooks/useTheme';
+import { instructorGrades } from '../utils/gradeStats';
 
-const GPA_MAP = { aPlus: 4.0, a: 4.0, aMinus: 3.67, bPlus: 3.33, b: 3.0, bMinus: 2.67, cPlus: 2.33, c: 2.0, cMinus: 1.67, dPlus: 1.33, d: 1.0, dMinus: 0.67, f: 0.0 };
 const SEASON_ORDER = { 'wi': 1, 'sp': 2, 'su': 3, 'fa': 4 };
 
 function sortOfferings(offerings) {
@@ -15,16 +15,8 @@ function sortOfferings(offerings) {
 }
 
 function calcInstructorGpa(offering, instructorId) {
-  let qualityPoints = 0, total = 0;
-  offering.sections?.forEach(s => {
-    if (s.instructor?.id === instructorId && s.grades) {
-      total += s.grades.total || 0;
-      Object.keys(GPA_MAP).forEach(k => {
-        qualityPoints += (s.grades[k] || 0) * GPA_MAP[k];
-      });
-    }
-  });
-  return total > 0 ? parseFloat((qualityPoints / total).toFixed(2)) : null;
+  const gpa = instructorGrades([offering], instructorId)?.gpa;
+  return Number.isFinite(gpa) ? parseFloat(gpa.toFixed(2)) : null;
 }
 
 function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
@@ -38,7 +30,7 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
 
   // Course-wide GPA for every term (always shown)
   const courseGpaData = sorted.map(o =>
-    o.cumulative?.gpa ? parseFloat(o.cumulative.gpa.toFixed(2)) : null
+    Number.isFinite(o.cumulative?.gpa) ? parseFloat(o.cumulative.gpa.toFixed(2)) : null
   );
 
   // Instructor-specific GPA (only for terms that instructor taught, null otherwise)
@@ -145,6 +137,7 @@ function GpaTrendChart({ courseOfferings, selectedInstructorId }) {
     <div className="GpaTrendChart">
       <ReactECharts
         option={option}
+        notMerge
         style={{ height: '350px', width: '100%' }}
         theme={theme === 'dark' ? 'dark' : undefined}
       />

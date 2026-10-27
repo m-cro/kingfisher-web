@@ -44,3 +44,4 @@ export const exploreCourses = (params) => api.get('/explore/courses', { params }
 export const exploreInstructors = (params) => api.get('/explore/instructors', { params }).then(res => res.data);
 
 export default api;
+export const getInstructor = id => api.get(`/instructors/${id}`).then(res => res.data);

@@ -17,7 +17,7 @@ test('home page submits a course search', async ({ page }) => {
   await page.goto('/');
   await expect(page.getByRole('heading', { name: /Kingfisher/ })).toBeVisible();
   await page.getByPlaceholder(/Search for a course/).fill('CS 225');
-  await page.getByRole('button', { name: 'Search' }).click();
+  await page.getByRole('button', { name: 'Search', exact: true }).click();
 
   await expect(page).toHaveURL(/\/search\?q=CS%20225/);
   await expect(page.getByRole('heading', { name: 'Search Results' })).toBeVisible();
@@ -42,7 +42,7 @@ test('explore catalog shows subjects and switches tabs', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Explore' })).toBeVisible();
   await expect(page.getByRole('link', { name: /Computer Science/ })).toBeVisible();
 
-  await page.getByRole('button', { name: 'Courses' }).click();
+  await page.getByRole('button', { name: 'Courses', exact: true }).click();
   await expect(page).toHaveURL(/tab=courses/);
   await expect(page.getByText('No results found.')).toBeVisible();
 });
